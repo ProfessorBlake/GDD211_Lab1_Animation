@@ -6,10 +6,13 @@ public class PlayerAnimation : MonoBehaviour
 {
 	public Animator PlayerBodyAnimator;
 	public Animator PlayerEyeAnimator;
+
 	public SpriteRenderer PlayerSpriteRenderer;
+
 	public Rigidbody2D BodyRB;
 	public Rigidbody2D GlassesRB;
 
+	//These are the collision layers for the physics engine. This allows us to tell if a player hit another player.
 	[Header("Layers")]
 	public int DefaultLayer;
 	public int PlayerLayer;
@@ -26,6 +29,7 @@ public class PlayerAnimation : MonoBehaviour
 		BodyRB.angularVelocity = Random.Range(-45f, 45f);
 	}
 
+	//If a players health drops below 0, their glasses pop off.
 	private void LoseGlasses()
 	{
 		if (GlassesRB.isKinematic)
@@ -37,17 +41,28 @@ public class PlayerAnimation : MonoBehaviour
 		}
 	}
 
+	//Take some damage.
+	private void GetHit()
+	{
+		health -= 25f;
+		PlayerBodyAnimator.SetTrigger("Hit");
+		PlayerEyeAnimator.SetTrigger("Hit");
+		if (health <= 0f)
+		{
+			LoseGlasses();
+		}
+	}
+
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
 		if(collision.gameObject.layer == PlayerLayer)
 		{
-			health -= 25f;
-			PlayerBodyAnimator.SetTrigger("Hit");
-			PlayerEyeAnimator.SetTrigger("Hit");
-			if(health <= 0f)
-			{
-				LoseGlasses();
-			}
+			GetHit();
 		}
+	}
+
+	private void OnMouseDown()
+	{
+		GetHit();
 	}
 }
